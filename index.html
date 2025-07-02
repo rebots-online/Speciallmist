@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specialized Agentic LLM Demo</title>
+<style>
+  body {font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333;}
+  .container {max-width: 1000px; margin: auto; padding: 20px;}
+  h1, h2 {text-align: center;}
+  .intro {background: #fff; padding: 15px; border-radius: 5px; margin-bottom: 20px;}
+  .llm-panels {display: flex; flex-wrap: wrap; gap: 10px;}
+  .panel {flex: 1 1 45%; background: #fff; padding: 10px; border-radius: 5px; min-height: 200px; position: relative;}
+  .panel pre {white-space: pre-wrap; background: #272822; color: #f8f8f2; padding: 10px; border-radius: 5px; overflow-x: auto;}
+  .controls {margin-top: 10px; text-align: center;}
+  .highlight {border: 2px dashed #ff9800; padding: 5px; border-radius: 5px; margin-top: 5px;}
+  .explanation {display:none; background:#e0f7fa; padding:10px; margin-top:5px; border-radius:5px;}
+  .info {cursor:pointer; color:#1976d2; margin-left:4px;}
+  @media(max-width:600px){.panel{flex:1 1 100%;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Specialized Agentic LLM Demo</h1>
+  <div class="intro">
+    <p>This demo shows how a <span class="info" data-term="agentic">agentic</span> coding LLM specialized in the JavaScript ecosystem behaves compared to a general coding LLM. The specialized model has a <span class="info" data-term="reduced">reduced English</span> vocabulary and focuses on <span class="info" data-term="js">JS-derived languages</span>.</p>
+  </div>
+  <div class="llm-panels">
+    <div class="panel" id="generalPanel">
+      <h2>General Coding LLM</h2>
+      <pre id="generalOutput">Awaiting prompt...</pre>
+    </div>
+    <div class="panel" id="specialPanel">
+      <h2>Specialized JS Agent LLM</h2>
+      <pre id="specialOutput">Awaiting prompt...</pre>
+    </div>
+  </div>
+  <div class="controls">
+    <textarea id="prompt" placeholder="Enter coding task here" rows="3" style="width:100%;"></textarea><br>
+    <label>Vocabulary Restriction:
+      <select id="vocab">
+        <option value="moderate">Moderate</option>
+        <option value="high">High</option>
+      </select>
+    </label>
+    <button id="generate">Generate</button>
+    <button id="explain">Explain Differences</button>
+  </div>
+  <div id="explanation" class="explanation"></div>
+</div>
+<script>
+const definitions = {
+  agentic: 'Agentic models can break down and perform tasks autonomously.',
+  reduced: 'Reduced English means simpler wording and concise comments.',
+  js: 'JS-derived languages include JavaScript, TypeScript, JSX and similar.'
+};
+
+document.querySelectorAll('.info').forEach(i => {
+  i.addEventListener('click', () => alert(definitions[i.dataset.term]));
+});
+
+function generalCode(prompt){
+  if(/react/i.test(prompt)){
+    return `# Python example\nclass Greeting:\n    def __init__(self, msg):\n        self.msg = msg\n    def show(self):\n        print(self.msg)`;
+  }
+  if(/file|node/i.test(prompt)){
+    return `// Java example\nimport java.nio.file.*;\nString data = Files.readString(Path.of("file.txt"));`;
+  }
+  return `// Generic pseudo code\nDo something with ${prompt}`;
+}
+
+function specialCode(prompt, level){
+  let code = '';
+  if(/react/i.test(prompt)){
+    code = `import React from 'react';\nexport default function Greet(){\n  return <div>Hello!</div>;\n}`;
+  } else if(/file/i.test(prompt)){
+    code = `const fs = require('fs');\nconst data = fs.readFileSync('file.txt','utf8');`;
+  } else {
+    code = `// JS snippet\nconsole.log('task done');`;
+  }
+  if(level==='high'){
+    code = code.replace(/\bfunction\b/g,'fn').replace(/const/g,'let');
+  }
+  return code;
+}
+
+document.getElementById('generate').onclick = () => {
+  const prompt = document.getElementById('prompt').value;
+  const level = document.getElementById('vocab').value;
+  document.getElementById('generalOutput').textContent = generalCode(prompt);
+  document.getElementById('specialOutput').textContent = specialCode(prompt, level);
+  document.getElementById('explanation').style.display='none';
+};
+
+document.getElementById('explain').onclick = () => {
+  const text = `The specialized agent sticks to JS tools and uses simpler wording. The general model may switch languages or use verbose style.`;
+  const ex = document.getElementById('explanation');
+  ex.textContent = text;
+  ex.style.display = 'block';
+};
+</script>
+</body>
+</html>
